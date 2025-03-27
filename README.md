@@ -1,7 +1,7 @@
 # Backend
 后端
 ## 搞不来云端数据库，请下载sa_delivery.sql文件导入本地
-命令行导入方法：
+MySQL命令行导入方法：
 
 新建数据库
 ```sql

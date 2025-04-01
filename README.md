@@ -13,6 +13,6 @@ USE database_name;
 ```
 导入sql文件
 ```sql
-source database_name \path\sa_delivery.sql
+source \path\sa_delivery.sql
 ```
 其中`\path\sa_delivery.sql`为要导入的sql文件路径

@@ -1,6 +1,23 @@
-# data_demo
-实体类和mapper类
-## 概述
+# Backend
+后端
+## 搞不来云端数据库，请下载sa_delivery2.0.sql文件导入本地
+MySQL命令行导入方法：
+
+新建数据库
+```sql
+CREATE DATABASE database_name;
+```
+切换到新建的数据库
+```sql
+USE database_name;
+```
+导入sql文件
+```sql
+source \path\sa_delivery2.0.sql
+```
+其中`\path\sa_delivery2.0.sql`为要导入的sql文件路径
+
+## 实体类和mapper类概述
 实体类放在pojo文件夹下，数据库映射类放在mapper文件夹下。
 
 目前只有最基础的，并且没经过测试，不保证正确性。

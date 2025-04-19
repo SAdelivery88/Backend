@@ -2,6 +2,8 @@ package group1.sa_delivery.Controller;
 
 import group1.sa_delivery.Service.UserService;
 import group1.sa_delivery.dto.ApiResponse;
+import group1.sa_delivery.dto.LoginData;
+import group1.sa_delivery.dto.LoginRequest;
 import group1.sa_delivery.dto.RegisterRequest;
 import group1.sa_delivery.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,4 +24,8 @@ public class UserController {
         return ResponseEntity.ok(userService.register(request));
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginData>> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(userService.login(request));
+    }
 }

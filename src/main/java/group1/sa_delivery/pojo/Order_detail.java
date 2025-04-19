@@ -12,9 +12,8 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @TableName("order_details")
 public class Order_detail {
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "order_detail_id", type = IdType.AUTO)
     @NotNull(message = "订单详情id不能为空")
-    @TableField("order_detail_id")
     private Integer detailId; //订单详情id
 
     @NotNull(message = "订单id不能为空")

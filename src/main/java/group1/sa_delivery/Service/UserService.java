@@ -3,6 +3,8 @@ package group1.sa_delivery.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import group1.sa_delivery.dao.UserMapper;
 import group1.sa_delivery.dto.ApiResponse;
+import group1.sa_delivery.dto.LoginData;
+import group1.sa_delivery.dto.LoginRequest;
 import group1.sa_delivery.dto.RegisterRequest;
 import group1.sa_delivery.pojo.Role;
 import group1.sa_delivery.pojo.User;
@@ -25,6 +27,7 @@ public class UserService {
     public ApiResponse<Void> register(RegisterRequest request){
         if(existUsername(request.getUsername()))
             return ApiResponse.error(400, "Username already exists");
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
@@ -32,6 +35,22 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setAddress(request.getAddress());
         userMapper.insert(user);
+
         return ApiResponse.success( "Register successfully", null);
+    }
+
+    public ApiResponse<LoginData> login(LoginRequest request){
+        QueryWrapper<User> queryWrapper = new QueryWrapper<User>();
+        queryWrapper.eq("username", request.getUsername());
+        User user = userMapper.selectOne(queryWrapper);
+
+        if(user == null)
+            return ApiResponse.error(400, "Username not found");
+        if(!request.getPassword().equals(user.getPassword()))
+            return ApiResponse.error(400, "Password incorrect");
+
+        LoginData loginData = new LoginData(user.getUserId(), user.getPhone(), user.getAddress(),
+                                            user.getRole().toString());
+        return ApiResponse.success("Login successfully", loginData);
     }
 }

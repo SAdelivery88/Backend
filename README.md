@@ -1,3 +1,16 @@
+# Backend最新版本：4.19更新
+
+新增注册、登录接口；
+
+修改数据库，在orders表中新增rider_id，请重新根据sa_delivery3.0.sql建立数据库；
+
+加入Spring Security框架依赖；
+
+Security目录下的getCurrentUser()方法尚未测试，可能存在问题；
+
+移除demos包
+
+---------------------------------
 # Backend
 后端
 

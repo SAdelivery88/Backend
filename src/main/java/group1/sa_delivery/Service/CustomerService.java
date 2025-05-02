@@ -13,8 +13,8 @@ import group1.sa_delivery.pojo.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -83,6 +83,7 @@ public class CustomerService {
      * customer get restaurants whose status = 'open'
      * @return List of GetRestaurantsData objects matching the search criteria
      */
+    @Transactional
     public List<GetRestaurantsData> getRestaurants() {
         List<Restaurant> restaurants = restaurantMapper.selectAllOpenRestaurants();
         if(restaurants.isEmpty()){
@@ -95,13 +96,14 @@ public class CustomerService {
     private List<GetRestaurantsData> convertRestaurantToGetRestaurantsData(List<Restaurant> restaurants) {
         return restaurants.stream()
                 .map(restaurant -> {
+                    //log.info("Restaurant ID: {}, Open Time: {}", restaurant.getRestaurantId(), restaurant.getOpenTime());
                     return GetRestaurantsData.builder()
                             .restaurantId(restaurant.getRestaurantId())
                             .sellerId(restaurant.getSellerId())
                             .name(restaurant.getName())
                             .address(restaurant.getAddress())
                             .phone(restaurant.getPhone())
-                            .openTime(restaurant.getOpenTime())
+                            .openTime(restaurant.getOpenTime() != null ? restaurant.getOpenTime() : "")
                             .status(String.valueOf(restaurant.getStatus()))
                             .build();
                 })

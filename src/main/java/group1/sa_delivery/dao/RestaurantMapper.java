@@ -23,6 +23,6 @@ public interface RestaurantMapper extends BaseMapper<Restaurant> {
      *
      * @return 餐厅列表
      */
-    @Select("SELECT * FROM restaurants WHERE status = 'open'")
+    @Select("SELECT restaurant_id,seller_id,name,address,phone,opening_hours AS openTime,status FROM restaurants")
     List<Restaurant> selectAllOpenRestaurants();
 }

@@ -17,12 +17,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .csrf().disable()
             .authorizeRequests()
-            .antMatchers("/**").permitAll()
-            .anyRequest().authenticated();
+                .antMatchers("/user/login", "/user/register", "/user/updateUserInfo", "/search").permitAll()
+                .antMatchers("/customer/**").permitAll()
+                .antMatchers("/seller/**").permitAll()
+                .antMatchers("/rider/**").permitAll()
+                .anyRequest().authenticated();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-} 
+}

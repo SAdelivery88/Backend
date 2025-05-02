@@ -2,17 +2,18 @@ package group1.sa_delivery.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import group1.sa_delivery.dao.UserMapper;
-import group1.sa_delivery.dto.ApiResponse;
-import group1.sa_delivery.dto.LoginData;
-import group1.sa_delivery.dto.LoginRequest;
-import group1.sa_delivery.dto.RegisterRequest;
+import group1.sa_delivery.dto.*;
 import group1.sa_delivery.pojo.Role;
 import group1.sa_delivery.pojo.User;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     @Autowired
@@ -52,5 +53,40 @@ public class UserService {
         LoginData loginData = new LoginData(user.getUserId(), user.getPhone(), user.getAddress(),
                                             user.getRole().toString());
         return ApiResponse.success("Login successfully", loginData);
+    }
+
+    /**
+     * Update user information
+     *
+     * @param currentUser The user to update
+     * @param request Request containing the fields to update
+     * @return ApiResponse with success or error message
+     */
+    public ApiResponse<Void> updateUserInfo(User currentUser, UpdateUserInfoRequest request) {
+        try {
+            //update
+            if (request.getUserName() != null) {
+                currentUser.setUsername(request.getUserName());
+            }
+
+            if (request.getPassword() != null) {
+                currentUser.setPassword(request.getPassword());
+            }
+
+            if (request.getPhone() != null) {
+                currentUser.setPhone(request.getPhone());
+            }
+
+            if (request.getAddress() != null) {
+                currentUser.setAddress(request.getAddress());
+            }
+
+            userMapper.updateById(currentUser);
+
+            return ApiResponse.success("Update " + currentUser.getUsername() + "'s Info successfully", null);
+        } catch (Exception e) {
+            // 捕获异常并返回 code = 400 的错误响应
+            return ApiResponse.error(400, "Failed to update user information: " + e.getMessage());
+        }
     }
 }

@@ -15,4 +15,5 @@ public enum RestaurantStatus {
         this.dbValue = dbValue;
     }
 
+
 }

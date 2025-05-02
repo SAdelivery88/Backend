@@ -33,4 +33,6 @@ public class Restaurant {
     private String openTime; //营业时间
 
     private RestaurantStatus status; //餐厅状态
+
+
 }

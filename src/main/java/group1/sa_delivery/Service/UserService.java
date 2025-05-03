@@ -8,12 +8,13 @@ import group1.sa_delivery.pojo.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     @Autowired
@@ -64,8 +65,11 @@ public class UserService {
      */
     public ApiResponse<Void> updateUserInfo(User currentUser, UpdateUserInfoRequest request) {
         try {
-            //update
-            if (request.getUserName() != null) {
+            // 检查新用户名是否已被占用
+            if (request.getUserName() != null && !currentUser.getUsername().equals(request.getUserName())) {
+                if (existUsername(request.getUserName())) {
+                    return ApiResponse.error(400, "The username already exists");
+                }
                 currentUser.setUsername(request.getUserName());
             }
 

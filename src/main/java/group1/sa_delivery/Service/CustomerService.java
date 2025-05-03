@@ -96,7 +96,6 @@ public class CustomerService {
     private List<GetRestaurantsData> convertRestaurantToGetRestaurantsData(List<Restaurant> restaurants) {
         return restaurants.stream()
                 .map(restaurant -> {
-                    //log.info("Restaurant ID: {}, Open Time: {}", restaurant.getRestaurantId(), restaurant.getOpenTime());
                     return GetRestaurantsData.builder()
                             .restaurantId(restaurant.getRestaurantId())
                             .sellerId(restaurant.getSellerId())

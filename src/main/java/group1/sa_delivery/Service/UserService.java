@@ -52,7 +52,7 @@ public class UserService {
             return ApiResponse.error(400, "Password incorrect");
 
         LoginData loginData = new LoginData(user.getUserId(), user.getPhone(), user.getAddress(),
-                                            user.getRole().toString());
+                user.getRole().toString());
         return ApiResponse.success("Login successfully", loginData);
     }
 

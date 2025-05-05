@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="group1.sa_delivery.dao.OrderMapper">
+    <resultMap id="SellerOrderResponseMap" type="group1.sa_delivery.dto.SellerOrderResponse">
+        <id property="orderId" column="order_id"/>
+        <result property="customerId" column="customer_id"/>
+        <result property="restaurantId" column="restaurant_id"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="deliveredAt" column="delivered_at"/>
+        <result property="riderId" column="rider_id"/>
+    </resultMap>
+    <select id="getOrdersBySellerId" resultMap="SellerOrderResponseMap">
+        SELECT o.order_id, o.customer_id, o.restaurant_id, o.total_amount, o.status, o.created_at, o.delivered_at, o.rider_id
+        FROM orders o
+                 JOIN restaurants r ON o.restaurant_id = r.restaurant_id
+        WHERE r.seller_id = #{seller_id}
+    </select>
+</mapper>

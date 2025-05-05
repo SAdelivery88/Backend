@@ -1,7 +1,7 @@
 package group1.sa_delivery.Service;
 
 
-
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import group1.sa_delivery.dao.RestaurantMapper;
@@ -10,16 +10,10 @@ import group1.sa_delivery.dto.SearchRequest;
 import group1.sa_delivery.pojo.Restaurant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 @Slf4j
 @Service

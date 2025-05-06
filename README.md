@@ -4,6 +4,8 @@
 
 实现customer下接口
 
+数据库更新，添加carts和cart_details表，请用sa_delivery4.0.sql重建数据库
+
 -----------------------------------
 # Backend最新版本：4.19更新
 

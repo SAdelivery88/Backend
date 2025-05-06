@@ -1,6 +1,7 @@
 package group1.sa_delivery.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import group1.sa_delivery.Security.SecurityUser;
 import group1.sa_delivery.dao.UserMapper;
 import group1.sa_delivery.dto.*;
 import group1.sa_delivery.pojo.Role;
@@ -8,6 +9,12 @@ import group1.sa_delivery.pojo.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +26,14 @@ public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     public boolean existUsername(String username){
-        QueryWrapper<User> queryWrapper = new QueryWrapper<User>();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
         return userMapper.selectCount(queryWrapper) > 0;
     }
@@ -32,7 +44,7 @@ public class UserService {
 
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.valueOf(request.getRole()));
         user.setPhone(request.getPhone());
         user.setAddress(request.getAddress());
@@ -42,18 +54,24 @@ public class UserService {
     }
 
     public ApiResponse<LoginData> login(LoginRequest request){
-        QueryWrapper<User> queryWrapper = new QueryWrapper<User>();
-        queryWrapper.eq("username", request.getUsername());
-        User user = userMapper.selectOne(queryWrapper);
+        try{
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        if(user == null)
-            return ApiResponse.error(400, "Username not found");
-        if(!request.getPassword().equals(user.getPassword()))
-            return ApiResponse.error(400, "Password incorrect");
+            SecurityUser securityUser = (SecurityUser)authentication.getPrincipal();
+            User user = securityUser.getUser();
 
-        LoginData loginData = new LoginData(user.getUserId(), user.getPhone(), user.getAddress(),
-                                            user.getRole().toString());
-        return ApiResponse.success("Login successfully", loginData);
+            LoginData loginData = new LoginData(user.getUserId(), user.getPhone(), user.getAddress(),
+                    user.getRole().toString());
+            return ApiResponse.success("Login successfully", loginData);
+        }catch (BadCredentialsException e){
+            return ApiResponse.error(400, "Wrong username or password");
+        }
     }
 
     /**

@@ -10,7 +10,7 @@ public enum OrderStatus {
     PREPARING("preparing"),
     DELIVERING("delivering"),
     COMPLETED("completed"),
-    CANCELLED("cancelled");
+    CANCELED("canceled");
 
     @EnumValue  //此字段对应数据库中的值
     private final String dbValue;

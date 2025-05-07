@@ -105,7 +105,7 @@ public class UserService {
 
             userMapper.updateById(currentUser);
 
-            return ApiResponse.success("Update " + currentUser.getUsername() + "'s Info successfully", null);
+            return ApiResponse.success("Update User(ID) " + currentUser.getUserId() + "'s Info successfully", null);
         } catch (Exception e) {
             // 捕获异常并返回 code = 400 的错误响应
             return ApiResponse.error(400, "Failed to update user information: " + e.getMessage());

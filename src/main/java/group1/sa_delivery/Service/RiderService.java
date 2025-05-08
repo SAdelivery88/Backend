@@ -6,6 +6,7 @@ import group1.sa_delivery.dao.OrderMapper;
 import group1.sa_delivery.dao.UserMapper;
 import group1.sa_delivery.dto.ApiResponse;
 import group1.sa_delivery.dto.RiderOrderRequest;
+import group1.sa_delivery.dto.RiderOrderResponse;
 import group1.sa_delivery.pojo.Delivery;
 import group1.sa_delivery.pojo.Order;
 import group1.sa_delivery.pojo.OrderStatus;
@@ -14,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.stream.Collectors;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Slf4j
@@ -105,5 +108,38 @@ public class RiderService {
             return ApiResponse.error(400,"Failed to update order status");
         }
         return ApiResponse.success("Change the order status to COMPLETED",null);
+    }
+    /**
+     * 骑手查看所有订单
+     * @return 包含订单数据的响应
+     */
+    public ApiResponse<List<RiderOrderResponse>> askOrderRider() {
+        List<Order> orders = orderMapper.getAllOrders();
+
+        List<RiderOrderResponse> responses = orders.stream()
+                .map(RiderOrderResponse::convertToRiderOrderResponse)
+                .collect(Collectors.toList());
+
+        if (orders.isEmpty()) {
+            return ApiResponse.error(400, "No orders found");
+        }
+        return ApiResponse.success(200, "Success", responses);
+    }
+    /**
+     * 骑手查看自己的订单
+     * @param riderId 骑手ID
+     * @return 包含订单数据的响应
+     */
+    public ApiResponse<List<RiderOrderResponse>> askMyOrderRider(int riderId) {
+        List<Order> orders = orderMapper.getOrdersByRiderId(riderId);
+
+        List<RiderOrderResponse> responses = orders.stream()
+                .map(RiderOrderResponse::convertToRiderOrderResponse)
+                .collect(Collectors.toList());
+
+        if (orders.isEmpty()) {
+            return ApiResponse.error(400, "No orders found for the rider");
+        }
+        return ApiResponse.success(200, "Success", responses);
     }
 }

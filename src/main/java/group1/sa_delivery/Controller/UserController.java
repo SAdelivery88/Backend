@@ -4,11 +4,11 @@ import group1.sa_delivery.Service.UserService;
 import group1.sa_delivery.dto.*;
 import group1.sa_delivery.pojo.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import group1.sa_delivery.Security.userDetailService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping("/updateUserInfo")
-    public ResponseEntity<ApiResponse<Void>> updateUserInfo(@Valid @RequestBody UpdateUserInfoRequest request) {
+    public ResponseEntity<ApiResponse<Void>> updateUserInfo(@Valid @RequestBody UpdateUserInfoRequest request, HttpServletRequest httpRequest) {
         if (request.getUserName() != null && request.getUserName().isEmpty()) {
             request.setUserName(null);
         }
@@ -47,8 +47,9 @@ public class UserController {
             request.setPhone(null);
         }
 
+        User currentUser = userdetailService.getCurrentUser();
+        ApiResponse<Void> response = userService.updateUserInfo(currentUser, request, httpRequest);
 
-        ApiResponse<Void> response = userService.updateUserInfo(userdetailService.getCurrentUser(),request);
         return ResponseEntity.ok(response);
     }
 }

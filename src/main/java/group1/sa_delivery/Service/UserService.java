@@ -14,9 +14,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Slf4j
 @Service
@@ -81,10 +85,12 @@ public class UserService {
      * @param request Request containing the fields to update
      * @return ApiResponse with success or error message
      */
-    public ApiResponse<Void> updateUserInfo(User currentUser, UpdateUserInfoRequest request) {
+    public ApiResponse<Void> updateUserInfo(User currentUser, UpdateUserInfoRequest request, HttpServletRequest httpServletRequest) {
         try {
+            String originalUsername = currentUser.getUsername(); // 保存原用户名
+
             // 检查新用户名是否已被占用
-            if (request.getUserName() != null && !currentUser.getUsername().equals(request.getUserName())) {
+            if (request.getUserName() != null && !originalUsername.equals(request.getUserName())) {
                 if (existUsername(request.getUserName())) {
                     return ApiResponse.error(400, "The username already exists");
                 }
@@ -92,7 +98,7 @@ public class UserService {
             }
 
             if (request.getPassword() != null) {
-                currentUser.setPassword(request.getPassword());
+                currentUser.setPassword(passwordEncoder.encode(request.getPassword()));
             }
 
             if (request.getPhone() != null) {
@@ -105,7 +111,30 @@ public class UserService {
 
             userMapper.updateById(currentUser);
 
-            return ApiResponse.success("Update User(ID) " + currentUser.getUserId() + "'s Info successfully", null);
+            // 重新查询最新用户信息（避免缓存问题）
+            QueryWrapper<User> wrapper = new QueryWrapper<>();
+            wrapper.eq("user_id", currentUser.getUserId());
+            User updatedUser = userMapper.selectOne(wrapper);
+            if (updatedUser == null) {
+                return ApiResponse.error(400, "Updated user not found");
+            }
+
+            // 更新 session 中的用户信息
+            HttpSession session = httpServletRequest.getSession();
+            session.setAttribute("currentUser", updatedUser);
+
+            // 若修改了用户名，更新Security上下文
+            if (!originalUsername.equals(updatedUser.getUsername())) {
+                UserDetails newUserDetails = new SecurityUser(updatedUser);
+                Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                    newUserDetails, 
+                    updatedUser.getPassword(), 
+                    newUserDetails.getAuthorities()
+                );
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+            }
+
+            return ApiResponse.success("Update User(ID) " + updatedUser.getUserId() + "'s Info successfully", null);
         } catch (Exception e) {
             // 捕获异常并返回 code = 400 的错误响应
             return ApiResponse.error(400, "Failed to update user information: " + e.getMessage());

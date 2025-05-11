@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @TableName("restaurants")
 public class Restaurant {
+
+
     @TableId(type = IdType.AUTO)
     @NotNull(message = "餐厅id不能为空")
     private Integer restaurantId; //餐厅id
@@ -33,4 +35,6 @@ public class Restaurant {
     private String openTime; //营业时间
 
     private RestaurantStatus status; //餐厅状态
+
+
 }

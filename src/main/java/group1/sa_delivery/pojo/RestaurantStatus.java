@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public enum RestaurantStatus {
     OPEN("open"),
-    CLOSE("close");
+    CLOSE("closed");
 
     @EnumValue  //此字段对应数据库中的值
     private final String dbValue;
@@ -14,5 +14,6 @@ public enum RestaurantStatus {
     RestaurantStatus(String dbValue) {
         this.dbValue = dbValue;
     }
+
 
 }

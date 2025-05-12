@@ -25,7 +25,7 @@ public class OrderService {
     @Transactional
     public ApiResponse<Void> createOrder(SellerOrderRequest sellerOrderRequest) {
 
-        Double sum = 0.0;
+        double sum = 0.0;
         //计算总价
         for (Order_detail orderDetail : sellerOrderRequest.getOrderDetailList()) {
             sum = sum + orderDetail.getPrice()*orderDetail.getQuantity();

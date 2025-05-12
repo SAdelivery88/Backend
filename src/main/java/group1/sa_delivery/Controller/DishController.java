@@ -1,82 +1,69 @@
 package group1.sa_delivery.Controller;
 
+import group1.sa_delivery.Service.DishService;
 import group1.sa_delivery.dao.DishMapper;
 import group1.sa_delivery.dto.ApiResponse;
+import group1.sa_delivery.dto.DishIdRequest;
+import group1.sa_delivery.dto.DishRequest;
 import group1.sa_delivery.pojo.Dish;
 import group1.sa_delivery.pojo.DishStatus;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("seller")
+@RequestMapping("/seller")
 @AllArgsConstructor
 public class DishController {
 
-    private final DishMapper dishMapper;
+    private final DishService dishService;
 
     /**
      * 添加菜品
-     * @param dish
+     * @param dishRequest
      * @return
      */
-    @PostMapping("addDish")
-    public ApiResponse<Void> add(@RequestBody  @Valid Dish dish) {
-        try {
-            dishMapper.insert(dish);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ApiResponse.error("添加失败");
-        }
-        return ApiResponse.success("添加成功",null);
+    @PostMapping("/addDish")
+    public ResponseEntity<ApiResponse<Void>> add(@RequestBody  @Valid DishRequest dishRequest) {
+        return ResponseEntity.ok(dishService.addDish(dishRequest));
     }
     /**
      * 修改菜品
-     * @param dish
+     * @param dishRequest
      * @return
      */
-    @PostMapping("modifyDish")
-    public ApiResponse<Void> update(@RequestBody @Valid Dish dish) {
-        try {
-            dishMapper.updateById(dish);
-        } catch (Exception e) {
-            return ApiResponse.error("修改失败");
-        }
-        return ApiResponse.success("修改成功",null);
+    @PostMapping("/modifyDish")
+    public ResponseEntity<ApiResponse<Void>> update(@RequestBody @Valid DishRequest dishRequest) {
+        return ResponseEntity.ok(dishService.updateDish(dishRequest));
     }
 
     /**
      * 下架菜品
-     * @param dish
-     * @return
      */
-    @PostMapping("unlistDish")
-    public ApiResponse<Void> unlist(@RequestBody @Valid Dish dish) {
-        try {
-            dish.setStatus(DishStatus.UNLIST);
-            dishMapper.updateById(dish);
-        } catch (Exception e) {
-            return ApiResponse.error("下架失败");
-        }
-        return ApiResponse.success("下架成功",null);
+    @PostMapping("/unlistDish")
+    public ResponseEntity<ApiResponse<Void>> unlist(@RequestBody DishIdRequest dishIdRequest) {
+        return ResponseEntity.ok(dishService.unlistDish(dishIdRequest.getDishId()));
     }
     /**
      * 删除菜品
      * @param dish_id
      * @return
      */
-    @DeleteMapping("deleteDish")
-    public ApiResponse<Void> delete(@RequestParam Integer dish_id) {
-        try {
-            dishMapper.deleteById(dish_id);
-        } catch (Exception e) {
-            return ApiResponse.error("删除失败");
-        }
-        return ApiResponse.success("删除成功",null);
+    @DeleteMapping("/deleteDish")
+    public ResponseEntity<ApiResponse<Void>> deleteDish(@RequestParam Integer dish_id) {
+        return ResponseEntity.ok(dishService.deleteDish(dish_id));
     }
 
-
+    /**
+     * 商品售空
+     */
+    @PostMapping("/soldoutDish")
+    public ResponseEntity<ApiResponse<Void>> sellerEmpty(@RequestBody DishIdRequest dishIdRequest) {
+        return ResponseEntity.ok(dishService.soldOutDish(dishIdRequest.getDishId()));
+    }
 }
 

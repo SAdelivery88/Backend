@@ -41,16 +41,16 @@ public class RiderService {
         Integer orderId = request.getOrderId();
         Order curOrder = orderMapper.selectByOrderId(orderId);
         if(curOrder == null){
-            return ApiResponse.error(400,"Order not found");
+            return ApiResponse.error(400,"找不到订单");
         }
 
         Delivery delivery = deliveryMapper.selectByOrderId(orderId);
         if(delivery != null){
-            return ApiResponse.error(400,"Order's Delivery already exists");
+            return ApiResponse.error(400,"该订单已被接单");
         }
         // 检查订单状态是否允许接单
         if(curOrder.getStatus() != OrderStatus.PREPARING){
-            return ApiResponse.error(400,"Order isn't PREPARING to accept");
+            return ApiResponse.error(400,"订单非Preparing状态,不允许接单");
         }
 
         // 计算预计送达时间(Order创建加30min）
@@ -60,7 +60,7 @@ public class RiderService {
         Integer curCustomerId = curOrder.getCustomerId();
         User curOrderCustomer = userMapper.selectById(curCustomerId);
         if(curOrderCustomer == null){
-            return ApiResponse.error(400,"Customer of Order is not found");
+            return ApiResponse.error(400,"无法找到订单中的顾客");
         }
         String orderAddress = curOrderCustomer.getAddress();
 
@@ -76,16 +76,16 @@ public class RiderService {
         // 插入配送记录
         int insertResult = deliveryMapper.insert(curDelivery);
         if (insertResult <= 0) {
-            return ApiResponse.error(400,"Failed to insert delivery record");
+            return ApiResponse.error(400,"插入配送记录失败");
         }
 
         curOrder.setStatus(OrderStatus.DELIVERING);
         int updateResult = orderMapper.updateById(curOrder);
         if (updateResult <= 0) {
-            return ApiResponse.error(400,"Failed to update order status");
+            return ApiResponse.error(400,"更新状态（to Delivering）失败");
         }
 
-        return ApiResponse.success("Change the order status to DELIVERING",null);
+        return ApiResponse.success("已修改订单状态为Delivering",null);
     }
     /**
      * the order is delivered
@@ -96,18 +96,18 @@ public class RiderService {
         Integer orderId = request.getOrderId();
         Order curOrder = orderMapper.selectByOrderId(orderId);
         if(curOrder == null){
-            return ApiResponse.error(400,"Order not found");
+            return ApiResponse.error(400,"找不到订单");
         }
         if(curOrder.getStatus() != OrderStatus.DELIVERING){
-            return ApiResponse.error(400,"Order isn't DELIVERING");
+            return ApiResponse.error(400,"订单非Delivering状态");
         }
 
         curOrder.setStatus(OrderStatus.COMPLETED);
         int updateResult = orderMapper.updateById(curOrder);
         if(updateResult <= 0){
-            return ApiResponse.error(400,"Failed to update order status");
+            return ApiResponse.error(400,"更新状态失败（to Completed）");
         }
-        return ApiResponse.success("Change the order status to COMPLETED",null);
+        return ApiResponse.success("修改订单状态为Completed",null);
     }
     /**
      * 骑手查看所有订单
@@ -121,9 +121,9 @@ public class RiderService {
                 .collect(Collectors.toList());
 
         if (orders.isEmpty()) {
-            return ApiResponse.error(400, "No orders found");
+            return ApiResponse.error(400, "找不到订单");
         }
-        return ApiResponse.success(200, "Success", responses);
+        return ApiResponse.success(200, "成功", responses);
     }
     /**
      * 骑手查看自己的订单
@@ -138,8 +138,8 @@ public class RiderService {
                 .collect(Collectors.toList());
 
         if (orders.isEmpty()) {
-            return ApiResponse.error(400, "No orders found for the rider");
+            return ApiResponse.error(400, "骑手没有已接单订单");
         }
-        return ApiResponse.success(200, "Success", responses);
+        return ApiResponse.success(200, "成功", responses);
     }
 }

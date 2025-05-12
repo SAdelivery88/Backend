@@ -90,7 +90,7 @@ public class CustomerService {
     public List<GetRestaurantsData> getRestaurants() {
         List<Restaurant> restaurants = restaurantMapper.selectAllOpenRestaurants();
         if(restaurants.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No restaurants found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"找不到商家");
         }
 
         return convertRestaurantToGetRestaurantsData(restaurants);
@@ -124,7 +124,6 @@ public class CustomerService {
         Integer dishId = request.getDishId();
         Integer quantity = request.getNumber();
         User currentUser = userDetailService.getCurrentUser();
-        //User currentUser = userMapper.selectById(1);
         Dish dish = dishMapper.selectById(dishId);
         Integer restaurant = dish.getRestaurantId();
         Cart cart = cartMapper.selectOne(new QueryWrapper<Cart>().eq("user_id", currentUser.getUserId())
@@ -132,11 +131,11 @@ public class CustomerService {
 
         // 检查菜品是否上架
         if (dish.getStatus() != DishStatus.AVAILABLE) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Dish is not available");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "菜品不可选");
         }
         // 检查数量是否合法
         if (quantity <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid quantity");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "数量不合法");
         }
 
         if(cart == null){
@@ -150,7 +149,7 @@ public class CustomerService {
         else{
             // 检查菜品是否已在购物车中
             if (existsByCartIdAndDishId(cart.getCartId(), dishId)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Dish is already in cart");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "菜品已存在");
             }
         }
 
@@ -163,7 +162,7 @@ public class CustomerService {
         cartDetailMapper.insert(cart_detail);
         cart.setTotalAmount(cart.getTotalAmount() + dish.getPrice() * quantity);
         cartMapper.updateById(cart);
-        return ApiResponse.success("Add to cart successfully", null);
+        return ApiResponse.success("成功添加到购物车", null);
     }
 
     public ApiResponse<CommitData> commit(CommitRequest request) {
@@ -174,13 +173,13 @@ public class CustomerService {
 
         // 检查购物车是否存在
         if (cart == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "未找到购物车");
         }
         Restaurant restaurant = restaurantMapper.selectById(restaurantId);
         List<Cart_detail> cart_details = cartDetailMapper.selectList(
                 new QueryWrapper<Cart_detail>().eq("cart_id", cart.getCartId()));
         if (cart_details.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart is empty");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "购物车为空");
         }
 
         // 提交订单
@@ -219,30 +218,30 @@ public class CustomerService {
         cartMapper.deleteById(cart.getCartId());
         cartDetailMapper.delete(new QueryWrapper<Cart_detail>().eq("cart_id", cart.getCartId()));
 
-        return ApiResponse.success("Commit successfully", commitData);
+        return ApiResponse.success("成功提交订单", commitData);
     }
 
     public ApiResponse<Void> cancel(Integer orderId){
         Order order = orderMapper.selectById(orderId);
         if(order == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "订单不存在");
         }
 
         order.setStatus(OrderStatus.CANCELED);
         orderMapper.updateById(order);
-        return ApiResponse.success("Cancel successfully", null);
+        return ApiResponse.success("成功取消订单", null);
     }
 
     public ApiResponse<Void> pay(PayRequest request){
         Integer orderId = request.getOrderId();
         Order order = orderMapper.selectById(orderId);
         if(order == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "订单不存在");
         }
 
         order.setStatus(OrderStatus.CONFIRMED);
         orderMapper.updateById(order);
-        return ApiResponse.success("Pay successfully", null);
+        return ApiResponse.success("支付成功", null);
     }
 
     public ApiResponse<List<GetPendingOrderData>> askPendingOrder(Integer customerId) {
@@ -259,7 +258,7 @@ public class CustomerService {
                         )
         );
         if (orders.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No pending order found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "没有正在进行的订单");
         }
 
         String address = userMapper.selectById(customerId).getAddress();
@@ -286,7 +285,7 @@ public class CustomerService {
             return data;
         }).collect(Collectors.toList());
 
-        return ApiResponse.success("Get pending order successfully", orderDataList);
+        return ApiResponse.success("成功获取进行中订单", orderDataList);
     }
 
     public ApiResponse<List<GetOrderData>> askCompletedOrder(Integer customerId) {
@@ -300,10 +299,10 @@ public class CustomerService {
                                 )
                         ));
         if (orders.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No completed order found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "没有完成的订单");
         }
 
         List<GetOrderData> orderDataList = orders.stream().map(GetOrderData::fromOrder).collect(Collectors.toList());
-        return ApiResponse.success("Get completed order successfully", orderDataList);
+        return ApiResponse.success("成功获取完成订单", orderDataList);
     }
 }

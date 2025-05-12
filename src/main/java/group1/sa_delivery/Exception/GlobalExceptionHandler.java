@@ -33,4 +33,13 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> error = ApiResponse.error(code, message);
         return ResponseEntity.ok(error);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
+        int code = 500;
+        String message = ex.getMessage();
+        ex.printStackTrace();
+        ApiResponse<Void> error = ApiResponse.error(code, message);
+        return ResponseEntity.ok(error);
+    }
 }

@@ -32,6 +32,6 @@ public class CommonController {
     public ResponseEntity<ApiResponse<List<SearchData>>> searchRestaurant(
             @Valid @RequestBody SearchRequest request){
         List<SearchData> results = commonService.searchRestaurantWithFilter(request);
-        return ResponseUtil.success("Search results retrieved successfully", results);
+        return ResponseUtil.success("搜索成功", results);
     }
 }

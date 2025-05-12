@@ -20,12 +20,12 @@ public class CustomerController {
     public ResponseEntity<ApiResponse<List<CusSelectData>>> CusSelectStore(
             @Valid @RequestBody CusSelectRequest request) {
         List<CusSelectData> results = customerService.cusSelectStore(request);
-        return ResponseUtil.success("SelectRestaurant results retrieved successfully", results);
+        return ResponseUtil.success("用户选择商家成功", results);
     }
     @GetMapping("/askRestaurant")
     public ResponseEntity<ApiResponse<List<GetRestaurantsData>>> GetRestaurant(){
         List<GetRestaurantsData> results = customerService.getRestaurants();
-        return ResponseUtil.success("GetRestaurant results retrieved successfully", results);
+        return ResponseUtil.success("用户查看商家列表成功", results);
     }
     @PostMapping("/addToCart")
     public ResponseEntity<ApiResponse<Void>> addToCart(@Valid @RequestBody AddCartRequest request) {

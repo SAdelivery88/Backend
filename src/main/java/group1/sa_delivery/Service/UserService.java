@@ -92,7 +92,7 @@ public class UserService {
             // 检查新用户名是否已被占用
             if (request.getUserName() != null && !originalUsername.equals(request.getUserName())) {
                 if (existUsername(request.getUserName())) {
-                    return ApiResponse.error(400, "The username already exists");
+                    return ApiResponse.error(400, "新用户名已被占用");
                 }
                 currentUser.setUsername(request.getUserName());
             }
@@ -134,10 +134,10 @@ public class UserService {
                 SecurityContextHolder.getContext().setAuthentication(newAuth);
             }
 
-            return ApiResponse.success("Update User(ID) " + updatedUser.getUserId() + "'s Info successfully", null);
+            return ApiResponse.success("修改UserId为 " + updatedUser.getUserId() + "的信息成功", null);
         } catch (Exception e) {
             // 捕获异常并返回 code = 400 的错误响应
-            return ApiResponse.error(400, "Failed to update user information: " + e.getMessage());
+            return ApiResponse.error(400, "更新失败: " + e.getMessage());
         }
     }
 }

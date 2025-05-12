@@ -18,6 +18,7 @@ public class Dish {
     private Integer dishId;     //菜品id
 
     @NotNull(message = "餐厅id不能为空")
+    @TableField("restaurant_id")
     private Integer restaurantId;//餐厅id
 
     @NotBlank(message = "菜品名称不能为空")

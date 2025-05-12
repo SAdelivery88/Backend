@@ -1,3 +1,12 @@
+# Backend最新版本：5.6更新
+
+修改Security相关文件，现在getCurrentUser方法可以使用了（大概）
+
+实现customer下接口
+
+数据库更新，添加carts和cart_details表，请用sa_delivery4.0.sql重建数据库
+
+-----------------------------------
 # Backend最新版本：4.19更新
 
 新增注册、登录接口；

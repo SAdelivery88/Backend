@@ -23,12 +23,14 @@ public class Order {
     @NotNull(message = "餐厅id不能为空")
     private Integer restaurantId;    //餐厅id
 
+    private Integer riderId;    //骑手id
+
     @NotNull(message = "总价不能为空")
     private Double totalAmount;    //总价
 
     private OrderStatus status;    //订单状态
 
-    private LocalDateTime createAt; //创建时间
+    private LocalDateTime createdAt; //创建时间
 
     private LocalDateTime deliveredAt;  //送达时间
 }
